@@ -1,0 +1,135 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:util="http://www.springframework.org/schema/util" xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+	xmlns:task="http://www.springframework.org/schema/task" xmlns:cache="http://www.springframework.org/schema/cache"
+	xsi:schemaLocation="  
+    http://www.springframework.org/schema/context  
+    http://www.springframework.org/schema/context/spring-context.xsd  
+    http://www.springframework.org/schema/beans  
+    http://www.springframework.org/schema/beans/spring-beans.xsd  
+    http://www.springframework.org/schema/tx  
+    http://www.springframework.org/schema/tx/spring-tx.xsd  
+    http://www.springframework.org/schema/jdbc  
+    http://www.springframework.org/schema/jdbc/spring-jdbc.xsd  
+    http://www.springframework.org/schema/cache  
+    http://www.springframework.org/schema/cache/spring-cache.xsd  
+    http://www.springframework.org/schema/aop  
+    http://www.springframework.org/schema/aop/spring-aop.xsd  
+    http://www.springframework.org/schema/util  
+    http://www.springframework.org/schema/util/spring-util.xsd
+     http://www.springframework.org/schema/task
+     http://www.springframework.org/schema/task/spring-task.xsd">
+     
+     
+	<!--导入外部配置文件 -->
+	<!-- <context:property-placeholder location="classpath:db-oracle.properties" /> -->
+	<!-- 加载配置文件 -->
+	<bean id="propertyConfigurer"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>classpath:*.properties</value>
+			</list>
+		</property>
+	</bean>
+
+	<!-- 扫描包 -->
+	<context:component-scan base-package="com.ht" >
+	         <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>  
+	</context:component-scan>
+
+	<!-- 数据源 写 -->
+	<bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+	 <!-- 基本属性 url、user、password -->
+     <property name="driverClassName" value="${jdbc.driver}" />
+     <property name="url" value="${jdbc.url}" />
+     <property name="username" value="${jdbc.username}" />
+     <property name="password" value="${jdbc.password}" />
+     <!-- 配置监控统计拦截的filters -->
+     <property name="filters" value="stat" />
+     <!-- 配置初始化大小、最小、最大 -->
+     <property name="maxActive" value="20" />
+     <property name="initialSize" value="1" />
+     <property name="minIdle" value="1" />
+
+     <!-- 配置获取连接等待超时的时间 -->
+     <property name="maxWait" value="60000" />     
+
+     <!-- 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 -->
+     <property name="timeBetweenEvictionRunsMillis" value="60000" />
+
+     <!-- 配置一个连接在池中最小生存的时间，单位是毫秒 -->
+     <property name="minEvictableIdleTimeMillis" value="300000" />
+
+     <property name="testWhileIdle" value="true" />
+     <property name="testOnBorrow" value="false" />
+     <property name="testOnReturn" value="false" />
+
+     <!-- 打开PSCache，并且指定每个连接上PSCache的大小 -->
+     <property name="poolPreparedStatements" value="true" />
+     <property name="maxOpenPreparedStatements" value="20" />
+	</bean>
+
+
+
+	<!-- 定义事务管理器 -->
+	<bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+
+
+	<!-- http://www.jb51.net/article/136968.htm -->
+	<!-- spring和MyBatis完美整合，不需要mybatis的配置映射文件 构造SqlSessionFactory -->
+	<!-- https://blog.csdn.net/qq_26790807/article/details/62429290 -->
+	<!-- https://blog.csdn.net/wx5040257/article/details/78756477 -->
+	<!-- https://gitee.com/free/Mybatis_PageHelper -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<!-- 别名包 -->
+		<property name="typeAliasesPackage" value="com.ht.pojo" />
+		<!-- 定义数据源 -->
+		<property name="dataSource" ref="dataSource" />
+		<!-- 自动扫描mapping.xml文件 -->
+		<property name="mapperLocations" value="classpath:com/ht/mapper/*.xml"></property>
+	</bean>
+	
+	
+	<!-- 定义Mapper接口扫描器 -->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<!-- 扫描mapper包 -->
+		<property name="basePackage" value="com.ht.dao"/>
+	</bean>
+
+
+
+ <aop:aspectj-autoproxy/>
+ <tx:annotation-driven /> 
+ <!-- https://www.cnblogs.com/qinyubin/p/4075466.html -->
+ <!-- http://blog.sina.com.cn/s/blog_67aaf4440100x2pb.html -->
+ <!--  <aop:config>
+        <aop:pointcut id="appService" expression="execution(* com.ye.dao..*.*(..))"/>
+        <aop:advisor advice-ref="txAdvice" pointcut-ref="appService"/>
+    </aop:config>
+
+    <tx:advice id="txAdvice" transaction-manager="transactionManager">
+        <tx:attributes>
+            <tx:method name="select*" read-only="true"/>
+            <tx:method name="find*" read-only="true"/>
+            <tx:method name="get*" read-only="true"/>
+            <tx:method name="*"/>
+        </tx:attributes>
+    </tx:advice> -->
+
+<!-- 定时任务 -->
+<task:executor id="executor" pool-size="10" />
+<task:scheduler id="scheduler" pool-size="20" />
+<task:annotation-driven executor="executor"	scheduler="scheduler" />
+	
+	
+	
+ <import resource="classpath:app-httpclient.xml"/>
+ <import resource="classpath:app-mail.xml"/>
+</beans>

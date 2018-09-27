@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 为这个mapper指定一个唯一的namespace，namespace的值习惯上设置成包名+sql映射文件名，这样就能够保证namespace的值是唯一的 
+	例如namespace="me.gacl.mapping.userMapper"就是me.gacl.mapping(包名)+userMapper(userMapper.xml文件去除后缀) -->
+<mapper namespace="com.ht.dao.EmailDao">
+
+	<select id="selectAll" resultType="Email">
+		select * from email t
+		<where>
+		<if test="isSender != null"> t.isSender &gt; 0</if>
+		</where>
+	</select>
+
+
+	<insert id="save">
+		<selectKey keyProperty="count" resultType="int" order="BEFORE">
+			select count(1) from email where `emailAddress` = #{emailAddress}
+		</selectKey>
+		<if test="count > 0">
+			update email
+			<trim prefix="set" suffixOverrides=",">
+				<if test="emailAddress != null">`emailAddress` = #{emailAddress, jdbcType=VARCHAR},</if>
+				<if test="name != null">`name` = #{name,jdbcType=VARCHAR},</if>
+				<if test="isSender != null">isSender = #{isSender,jdbcType=VARCHAR},</if>
+			</trim>
+			where `emailAddress` = #{emailAddress}
+		</if>
+		<if test="count == 0">
+			insert into email
+			(
+			`emailAddress`,
+			`name`,
+			isSender
+			)
+			values
+			(
+			#{emailAddress, jdbcType=VARCHAR},
+			#{name,jdbcType=VARCHAR},
+			#{isSender,jdbcType=VARCHAR}
+			)
+		</if>
+	</insert>
+</mapper>

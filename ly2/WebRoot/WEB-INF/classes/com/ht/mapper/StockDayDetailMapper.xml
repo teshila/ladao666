@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- https://blog.csdn.net/zo_184/article/details/52834335 -->
+<mapper namespace="com.ht.dao.StockDayDetailDao">
+
+	<select id="slectAllByPage" resultType="StockDayDetail">
+		select * from stockdaydetail  t
+		<where>
+			<if test="code != null">or  t.code = #{code}</if>
+			<if test="name != null">or t.`name` like CONCAT(CONCAT('%',#{name}),'%'</if>
+			limit #{pageBegin},#{pageEnd}
+		</where>
+	</select>
+	
+	
+	<select id="selectAll">
+		select * from stockdaydetail  t
+		<where>
+			<if test="code != null">or  t.code = #{code}</if>
+			<if test="name != null">or t.`name` like CONCAT(CONCAT('%',#{name}),'%'</if>
+			<if test="beginDate != null">or addtime  &lt; #{beginDate}</if>
+			<if test="endDate != null">or addtime  &gt; #{endDate}</if>
+		</where>
+	</select>
+	
+	
+	<select id="getTotalCount">
+	select count(1) from stockdaydetail  t
+		<where>
+			<if test="code != null">or  t.code = #{code}</if>
+			<if test="name != null">or t.`name` like CONCAT(CONCAT('%',#{name}),'%'</if>
+			<if test="beginDate != null">or addtime  &lt; #{beginDate}</if>
+			<if test="endDate != null">or addtime  &gt; #{endDate}</if>
+		</where>
+	</select>
+
+
+
+	<insert id="save">
+		insert into stockdaydetail(
+		`code`,
+		`name`,
+		closeprice,
+		minprice,
+		maxprice,
+		prevclose,
+		open_price,
+		marketType,
+		stockPinYin,
+		risePrice
+		) values(
+		#{code},
+		#{name},
+		#{closeprice},
+		#{minprice},
+		#{maxprice},
+		#{prevclose},
+		#{open_price},
+		#{marketType},
+		#{stockPinYin},
+		#{risePrice}
+		)
+	</insert>
+</mapper>

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script type="text/javascript" src="static/js/jquery-1.11.1.min.js"></script>
+<meta charset="UTF-8">
+<title>Title</title>
+</head>
+<body>
+	<script>
+		function loadingDesk(){
+			if (window.Notification) {
+				var popNotice = function() {
+					if (Notification.permission == "granted") {
+						var notification = new Notification("Hi，帅哥：", {
+							body : '代码【000983】，名称【西山煤电】 达到【6.66】啦',
+							icon : '//image.zhangxinxu.com/image/study/s/s128/mm1.jpg'
+						});
+						notification.onshow = function() {
+							setTimeout(function() {
+								notification.close();
+							}, 800);
+
+						};
+						/* notification.onclick = function() {
+						     text.innerHTML = '张小姐已于' + new Date().toTimeString().split(' ')[0] + '加你为好友！';
+						     notification.close();    
+						 };*/
+					}
+				};
+			}
+			
+			
+			Notification.requestPermission(function(permission) {
+				popNotice();
+			});
+			
+			
+			var isShine = true;
+		    var title = document.title;
+		    if (isShine == true) {
+		        if (/新/.test(title) == false) {
+		            document.title = '【你有新消息】';    
+		        } else {
+		            document.title = '【　　　　　】';
+		        }
+		    } else {
+		        document.title = titleInit;
+		    }
+		}
+		
+	$(function(){
+		loadingDesk();
+		setInterval(function(){
+			loadingDesk();
+		}, 2000);			
+    })
+		
+	</script>
+</body>
+</html>

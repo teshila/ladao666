@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- https://blog.csdn.net/zo_184/article/details/52834335 -->
+<mapper namespace="com.ht.dao.StockDao">
+
+
+	<select id="getTotalCount" resultType="Integer">
+		select count(1) from stock s
+		<where>
+			<if test="code != null">s. `code` = #{code, jdbcType=VARCHAR},</if>
+			<if test="name != null">and s.`name`= #{name}</if>
+			<if test="stockPinYin != null">and s.`stockPinYin`= #{stockPinYin}</if>
+			<if test="orderType == 1">
+				s.current_price - s.prevclose &gt; 0 
+			</if>
+			<if test="orderType == 0">
+				s.current_price - s.prevclose = 0 
+			</if>
+			<if test="orderType == -1">
+				s.current_price - s.prevclose &lt; 0
+			</if>
+		</where>
+	</select>
+
+	<select id="selectStockByParam" resultType="Stock">
+		select * from stock s
+		<where>
+			<if test="code != null">s. `code` = #{code, jdbcType=VARCHAR},</if>
+			<if test="name != null">and s.`name`= #{name}</if>
+			<if test="stockPinYin != null">and s.`stockPinYin`= #{stockPinYin}</if>
+			<if test="orderType == 1">
+				s.current_price - s.prevclose &gt; 0 
+			</if>
+			<if test="orderType == 0">
+				s.current_price - s.prevclose = 0 
+			</if>
+			<if test="orderType == -1">
+				s.current_price - s.prevclose &lt; 0
+			</if>
+		</where>
+		limit #{start},#{size}
+	</select>
+
+
+
+
+
+	<insert id="save">
+		<selectKey keyProperty="count" resultType="int" order="BEFORE">
+			select count(1) from stock where `code` = #{code}
+		</selectKey>
+		<if test="count > 0">
+			update stock
+			<trim prefix="set" suffixOverrides=",">
+				<if test="code != null">`code` = #{code, jdbcType=VARCHAR},</if>
+				<if test="name != null">`name` = #{name,jdbcType=VARCHAR},</if>
+				<if test="prevclose != null">prevclose = #{prevclose,jdbcType=VARCHAR},</if>
+				<if test="current_price != null">current_price = #{current_price,jdbcType=VARCHAR},</if>
+				<if test="maxprice != null">maxprice = #{maxprice,jdbcType=VARCHAR},</if>
+				<if test="minprice != null">minprice = #{minprice,jdbcType=VARCHAR},</if>
+				<if test="open_price != null">`open_price` = #{open_price,jdbcType=VARCHAR},</if>
+				<if test="marketType != null">marketType = #{marketType,jdbcType=VARCHAR},</if>
+				<if test="stockPinYin != null">stockPinYin = #{stockPinYin,jdbcType=VARCHAR},</if>
+				<if test="risePrice != null">risePrice = #{risePrice,jdbcType=VARCHAR},</if>
+			</trim>
+			where `code` = #{code}
+		</if>
+		<if test="count == 0">
+			insert into stock
+			(
+			`code`,
+			`name`,
+			prevclose,
+			current_price,
+			maxprice,
+			minprice,
+			`open_price`,
+			marketType,
+			stockPinYin,
+			risePrice
+			)
+			values
+			(
+			#{code, jdbcType=VARCHAR},
+			#{name,jdbcType=VARCHAR},
+			#{prevclose,jdbcType=VARCHAR},
+			#{current_price,jdbcType=VARCHAR},
+			#{maxprice,jdbcType=VARCHAR},
+			#{minprice,jdbcType=VARCHAR},
+			#{open_price,jdbcType=VARCHAR},
+			#{marketType,jdbcType=VARCHAR},
+			#{stockPinYin,jdbcType=VARCHAR}
+			#{risePrice,jdbcType=VARCHAR}
+			)
+		</if>
+	</insert>
+
+
+	<!-- <update id="updateBatch" parameterType="map"> update DC_JC_RULE <trim 
+		prefix="set" suffixOverrides=","> <if test="jc_rule_package_id != null">jc_rule_package_id 
+		= #{jc_rule_package_id,jdbcType=VARCHAR}, </if> <if test="jc_rule_package_name 
+		!= null">jc_rule_package_name = #{jc_rule_package_name, jdbcType=VARCHAR}, 
+		</if> </trim> <where> jc_rule_id =#{jc_rule_id,jdbcType=VARCHAR} </where> 
+		</update> -->
+
+
+
+	<select id="getStockInfo" resultType="Stock">
+		select * from stock s
+		<where>
+			<if test="orderType == 1">
+				s.current_price - s.prevclose &gt; 0 ORDER BY
+				s.current_price
+			</if>
+			<if test="orderType == 0">
+				s.current_price - s.prevclose = 0 ORDER BY
+				s.current_price 
+			</if>
+			<if test="orderType == -1">
+				s.current_price - s.prevclose &lt; 0 ORDER BY
+				s.current_price 
+			</if>
+		</where>
+	</select>
+</mapper>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- https://blog.csdn.net/zo_184/article/details/52834335 -->
+<mapper namespace="com.ht.StockDao">
+	<!-- <select id="getContent" resultType="Content">
+		SELECT * FROM file_inf where DATE_SUB(CURDATE(), INTERVAL 7 DAY) &lt; date(create_time)
+	</select> -->
+</mapper>

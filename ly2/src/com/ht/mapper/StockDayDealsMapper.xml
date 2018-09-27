@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- https://blog.csdn.net/zo_184/article/details/52834335 -->
+<mapper namespace="com.ht.dao.StockDealDao">
+
+
+	<select id="selectAllByPage" resultType="StockDayDealsRecord">
+		select * from stockDayDealRecord t 
+		<where>
+			<if test="code != null">or  t.code = #{code}</if>
+			<if test="name != null">or t.`name` like CONCAT(CONCAT('%',#{name}),'%'</if>
+			limit #{pstart},#{psize}
+		</where>
+	</select>
+	
+	
+	
+	<select id="selectAll" resultType="StockDayDealsRecord">
+		select * from stockDayDealRecord t 
+		<where>
+			<if test="code != null">or  t.code = #{code}</if>
+			<if test="entset != null">or t.`name` like CONCAT(CONCAT('%',#{name}),'%'</if>
+		</where>
+	</select>
+
+	<select id="getTotalCount" resultType="StockDayDealsRecord">
+		select count(1) from stockDayDealRecord
+		<where>
+			<if test="code != null">or `code` = #{code, jdbcType=VARCHAR},</if>
+			<if test="name != null">or `name` = #{name,jdbcType=VARCHAR},</if>
+		</where>
+	</select>
+
+
+
+	<insert id="save">
+		insert into stockDayDealRecord
+			(
+			`code`,
+			`name`,
+			`price`,
+			marketType,
+			stockPinYin
+			)
+			values
+			(
+			#{code, jdbcType=VARCHAR},
+			#{name,jdbcType=VARCHAR},
+			#{price,jdbcType=VARCHAR},
+			#{marketType,jdbcType=VARCHAR},
+			#{stockPinYin,jdbcType=VARCHAR}
+			)
+	</insert>
+
+</mapper>
